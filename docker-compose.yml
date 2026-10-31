@@ -1,0 +1,11 @@
+services:
+  xray:
+    image: ghcr.io/xtls/xray-core:latest
+    container_name: xray-reality
+    restart: unless-stopped
+    ports:
+      - "${PORT:-443}:443/tcp"
+    volumes:
+      - ./config/server.json:/etc/xray/config.json:ro
+    entrypoint: ["xray"]
+    command: ["run", "-config", "/etc/xray/config.json"]
