@@ -80,6 +80,38 @@ docker compose down             # 停止服务
   `bash setup.sh` 重新生成链接（或只改链接中的 IP）。
 - **添加多台设备**：所有设备导入同一条链接即可，无需改服务端。
 
+## 方案 B：L2TP/IPSec VPN——手机自带 VPN 功能直连（零 App）
+
+不想在手机装 v2rayNG 等 App 的，用这条路线：服务器跑一个 L2TP/IPSec VPN，
+Android/iOS **系统自带**的 VPN 设置直接连，四个格子填完即用。
+
+```bash
+# 在香港服务器上（先 git pull 拿到最新代码）
+cd /opt/hk-relay && git pull
+cd vpn && bash setup_vpn.sh
+```
+
+脚本会自动生成凭据并打印四个值，手机按下面填：
+
+| 手机上的字段 | 填什么 |
+|---|---|
+| 服务器地址 / Server | 服务器公网 IP（如 103.115.42.98）|
+| IPSec 预共享密钥 / 密钥 / Secret | 脚本打印的 `IPSec 预共享密钥` |
+| 用户名 / 账户 | 脚本打印的 `用户名` |
+| 密码 | 脚本打印的 `密码` |
+
+- **Android**：设置 → 网络与互联网 → VPN → 添加 VPN → 类型选 **L2TP/IPSec PSK**（"IPSec 标识"留空）
+- **iOS**：设置 → 通用 → VPN 与设备管理 → 添加 VPN 配置 → 类型选 **L2TP**
+- **Windows/Mac 电脑**：系统自带 VPN 客户端同样支持 L2TP，一样的四个值
+
+⚠️ 安全组需放行 **UDP 500 和 UDP 4500**。
+
+**风险提示**：L2TP/IPSec 无流量伪装，被运营商/GFW 干扰的风险高于方案 A 的
+Reality。适合日常轻度使用；一旦出现连不上/频繁掉线，说明该协议在你所在网络
+被针对，请切换到方案 A（xray + v2rayNG）。两方案可同时运行互不冲突
+（L2TP 用 UDP 500/4500，xray 用 TCP 443）。凭据保存在服务器 `vpn/.env`，
+泄露即换：`rm vpn/.env && bash setup_vpn.sh` 重跑生成新凭据。
+
 ## 五、合规与安全须知 ⚠️
 
 - 本方案仅建议用于**访问 Docker Hub、GitHub 等开发资源的个人正当用途**。

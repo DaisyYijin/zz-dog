@@ -1,3 +1,5 @@
 config/server.json
 client-link.txt
 .env
+vpn/.env
+vpn/data/
